@@ -1,5 +1,24 @@
+# Configuración privada
 /config/database.local.php
-/.env
-/.env.*
+**/database.local.php
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Permitir plantillas de configuración
+!.env.example
+!**/.env.example
+!/config/database.local.example.php
+
+# Dependencias
 /vendor/
+**/node_modules/
+
+# Archivos compilados
+**/dist/
+
+# Archivos temporales y del sistema
+*.log
 .DS_Store
+Thumbs.db

@@ -1,0 +1,52 @@
+sudo tee /opt/lampp/htdocs/carga-academica/docs/index.html > /dev/null <<'EOF'
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API - Gestión de Carga Académica</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+    <style>
+        body {
+            margin: 0;
+            background: #fafafa;
+        }
+        .header {
+            padding: 20px;
+            background: #172554;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .header h2 {
+            margin: 0;
+        }
+        .header p {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Gestión de Carga Académica</h2>
+        <p>Documentación interactiva de la API REST</p>
+    </div>
+
+    <div id="swagger-ui"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script>
+        window.onload = function () {
+            SwaggerUIBundle({
+                url: "../api/openapi.yaml",
+                dom_id: "#swagger-ui",
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis
+                ],
+                layout: "BaseLayout"
+            });
+        };
+    </script>
+</body>
+</html>
+EOF

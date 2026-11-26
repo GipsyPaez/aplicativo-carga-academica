@@ -164,3 +164,7 @@ No ejecutes este procedimiento contra `carga_academica`. El entorno aislado prep
 9. Cierra sesión y comprueba que una nueva visita al dashboard redirige al login. Prueba también el cierre por GET, que debe responder 405.
 
 Toda eliminación de este procedimiento debe apuntar exclusivamente a `carga_academica_test`. No ejecutes `DROP DATABASE` ni reutilices esta cuenta para datos reales.
+
+## Ampliación front-end y API REST
+
+La actividad 4 incorpora una API REST en PHP, una interfaz React con Axios, Hooks, Context API y React Router, y la especificación OpenAPI. Consulta [README_FRONTEND_API.md](README_FRONTEND_API.md) para los pasos de instalación, ejecución, pruebas y despliegue. La documentación del contrato está en `api/openapi.yaml`.

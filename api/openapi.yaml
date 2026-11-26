@@ -1,0 +1,185 @@
+openapi: 3.0.3
+info:
+  title: API REST - Gestión de carga académica
+  version: 1.0.0
+  description: API PHP que expone las funciones del sistema académico mediante JSON y sesiones seguras.
+servers:
+  - url: http://localhost/carga-academica/api
+    description: Entorno local (ajustar la ruta al instalar)
+security:
+  - sessionCookie: []
+paths:
+  /auth/csrf:
+    get:
+      security: []
+      summary: Obtener token CSRF inicial
+      responses:
+        '200': { description: Token CSRF }
+  /auth/register:
+    post:
+      security: []
+      summary: Registrar usuario
+      parameters: [{ in: header, name: X-CSRF-Token, required: true, schema: { type: string } }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Register' }
+      responses:
+        '201': { description: Usuario creado }
+        '409': { description: Correo ya registrado }
+  /auth/login:
+    post:
+      security: []
+      summary: Iniciar sesión
+      parameters: [{ in: header, name: X-CSRF-Token, required: true, schema: { type: string } }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Login' }
+      responses:
+        '200': { description: Sesión iniciada }
+        '401': { description: Credenciales incorrectas }
+  /auth/me:
+    get:
+      summary: Consultar usuario autenticado y token CSRF
+      responses: {'200': {description: Usuario y token}, '401': {description: No autenticado}}
+  /auth/logout:
+    post:
+      summary: Cerrar sesión
+      parameters: [{ in: header, name: X-CSRF-Token, required: true, schema: { type: string } }]
+      responses: {'200': {description: Sesión cerrada}}
+  /subjects:
+    get:
+      summary: Listar asignaturas del usuario
+      responses: {'200': {description: Colección de asignaturas}}
+    post:
+      summary: Crear asignatura
+      parameters: [{ in: header, name: X-CSRF-Token, required: true, schema: { type: string } }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SubjectInput' }
+      responses: {'201': {description: Asignatura creada}}
+  /subjects/{id}:
+    put:
+      summary: Actualizar asignatura propia
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+        - { in: header, name: X-CSRF-Token, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SubjectInput' }
+      responses: {'200': {description: Actualizada}, '404': {description: No encontrada}}
+    delete:
+      summary: Eliminar asignatura propia
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+        - { in: header, name: X-CSRF-Token, required: true, schema: { type: string } }
+      responses: {'200': {description: Eliminada}, '404': {description: No encontrada}}
+  /activities:
+    get:
+      summary: Listar actividades del usuario
+      parameters: [{ in: query, name: week, schema: { type: string, example: '2026-W48' } }]
+      responses: {'200': {description: Actividades}}
+    post:
+      summary: Crear actividad
+      parameters: [{ in: header, name: X-CSRF-Token, required: true, schema: { type: string } }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ActivityInput' }
+      responses: {'201': {description: Actividad creada}}
+  /activities/{id}:
+    put:
+      summary: Actualizar actividad propia
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+        - { in: header, name: X-CSRF-Token, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ActivityInput' }
+      responses: {'200': {description: Actualizada}, '404': {description: No encontrada}}
+    delete:
+      summary: Eliminar actividad propia
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+        - { in: header, name: X-CSRF-Token, required: true, schema: { type: string } }
+      responses: {'200': {description: Eliminada}}
+  /availability:
+    get:
+      summary: Consultar disponibilidad semanal
+      responses: {'200': {description: Siete días}}
+    put:
+      summary: Guardar disponibilidad semanal
+      parameters: [{ in: header, name: X-CSRF-Token, required: true, schema: { type: string } }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                days:
+                  type: object
+                  description: Claves 1 a 7, valores numéricos o null
+      responses: {'200': {description: Disponibilidad guardada}}
+  /weekly-index:
+    get:
+      summary: Calcular índice de carga semanal
+      parameters: [{ in: query, name: week, schema: { type: string, example: '2026-W48' } }]
+      responses: {'200': {description: Índice, actividades incluidas y excluidas}}
+  /calendar:
+    get:
+      summary: Consultar calendario mensual
+      parameters:
+        - { in: query, name: month, schema: { type: integer, minimum: 1, maximum: 12 } }
+        - { in: query, name: year, schema: { type: integer, minimum: 1000 } }
+      responses: {'200': {description: Eventos del mes}}
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: PHPSESSID
+  schemas:
+    Register:
+      type: object
+      required: [nombre, email, password]
+      properties:
+        nombre: { type: string, maxLength: 100 }
+        email: { type: string, format: email }
+        password: { type: string, minLength: 10 }
+    Login:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string }
+    SubjectInput:
+      type: object
+      required: [nombre]
+      properties:
+        nombre: { type: string, maxLength: 120 }
+        codigo: { type: string, nullable: true, maxLength: 30 }
+        horas_semanales: { type: number, minimum: 0, maximum: 999.9 }
+    ActivityInput:
+      type: object
+      required: [asignatura_id, titulo, tipo, horas_estimadas, dificultad, prioridad]
+      properties:
+        asignatura_id: { type: integer }
+        titulo: { type: string, maxLength: 150 }
+        descripcion: { type: string }
+        tipo: { type: string, enum: [Trabajo, Examen, Proyecto, Tarea] }
+        fecha_entrega: { type: string, format: date, nullable: true }
+        horas_estimadas: { type: number, minimum: 0, maximum: 9999 }
+        dificultad: { type: string, enum: [Baja, Media, Alta] }
+        prioridad: { type: string, enum: [Baja, Media, Alta] }
+        estado: { type: string, enum: [Pendiente, 'En progreso', Completada] }

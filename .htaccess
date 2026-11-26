@@ -1,0 +1,10 @@
+Options -Indexes
+<IfModule mod_rewrite.c>
+RewriteEngine On
+# API routes are handled by api/.htaccess. React client-side routes return the built app when deployed to root.
+RewriteCond %{REQUEST_URI} !^/carga-academica/api/
+RewriteCond %{REQUEST_URI} !-f
+RewriteCond %{REQUEST_URI} !-d
+RewriteCond %{DOCUMENT_ROOT}/carga-academica/app/index.html -f
+RewriteRule ^ app/index.html [L]
+</IfModule>
